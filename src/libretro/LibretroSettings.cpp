@@ -68,6 +68,8 @@ void CLibretroSettings::SetAllSettings(const retro_variable* libretroVariables)
 {
   CLockObject lock(m_mutex);
 
+  bool bOutputSettings = false;
+
   if (m_settings.empty())
   {
     for (const retro_variable* variable = libretroVariables; variable && variable->key && variable->value; variable++)
@@ -92,17 +94,24 @@ void CLibretroSettings::SetAllSettings(const retro_variable* libretroVariables)
         else
         {
           m_addon->Log(ADDON::LOG_ERROR, "Setting %s: invalid value \"%s\" (values are: %s)", setting.Key().c_str(), valueBuf, variable->value);
+          bOutputSettings = true;
         }
       }
       else
       {
         m_addon->Log(ADDON::LOG_ERROR, "Setting %s not found by Kodi", setting.Key().c_str());
+        bOutputSettings = true;
       }
 
       m_settings.insert(std::make_pair(setting.Key(), std::move(setting)));
     }
 
     m_bChanged = true;
+  }
+
+  if (bOutputSettings && !m_profileDirectory.empty())
+  {
+    // TODO: Write settings and language file
   }
 }
 
