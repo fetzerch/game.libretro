@@ -139,6 +139,25 @@ bool CInputManager::InputEvent(const game_input_event& event)
 
     bHandled = true;
   }
+  else if (event.type == GAME_INPUT_EVENT_RELATIVE_POINTER)
+  {
+    // Record mouse motion for polling
+    HandleMouseMotion(event.rel_pointer.x, event.rel_pointer.y);
+    bHandled = true;
+  }
+  else if (event.type == GAME_INPUT_EVENT_DIGITAL_BUTTON && event.port == -1)
+  {
+    if (std::string(event.feature_name) == "leftmouse")
+    {
+      m_mouseLeftButton.pressed = event.digital_button.pressed;
+      bHandled = true;
+    }
+    else if (std::string(event.feature_name) == "rightmouse")
+    {
+      m_mouseRightButton.pressed = event.digital_button.pressed;
+      bHandled = true;
+    }
+  }
   else
   {
     const unsigned int port = event.port;
@@ -192,6 +211,15 @@ bool CInputManager::ButtonState(libretro_device_t device, unsigned int port, uns
   {
     bState = IsPressed(buttonIndex);
   }
+  else if (device == RETRO_DEVICE_MOUSE)
+  {
+    switch (buttonIndex)
+    {
+      case 0: bState = m_mouseLeftButton.pressed; break;
+      case 1: bState = m_mouseRightButton.pressed; break;
+      default: break;
+    }
+  }
   else
   {
     if (m_devices[port])
@@ -205,26 +233,22 @@ bool CInputManager::ButtonState(libretro_device_t device, unsigned int port, uns
 
 int CInputManager::DeltaX(libretro_device_t device, unsigned int port)
 {
-  int deltaX = 0;
-
-  if (m_devices[port])
-  {
-    deltaX = m_devices[port]->Input().RelativePointerDeltaX();
-  }
-
-  return deltaX;
+  (void) device;
+  (void) port;
+  CLockObject lock(m_mouseMutex);
+  int x = m_mouseRelativePosition.x;
+  m_mouseRelativePosition.x = 0;
+  return x;
 }
 
 int CInputManager::DeltaY(libretro_device_t device, unsigned int port)
 {
-  int deltaY = 0;
-
-  if (m_devices[port])
-  {
-    deltaY = m_devices[port]->Input().RelativePointerDeltaY();
-  }
-
-  return deltaY;
+  (void) device;
+  (void) port;
+  CLockObject lock(m_mouseMutex);
+  int y = m_mouseRelativePosition.y;
+  m_mouseRelativePosition.y = 0;
+  return y;
 }
 
 bool CInputManager::AnalogStickState(unsigned int port, unsigned int analogStickIndex, float& x, float& y)
@@ -290,4 +314,11 @@ bool CInputManager::IsPressed(uint32_t character)
     {
       return keyEvent.character == character;
     }) > 0;
+}
+
+void CInputManager::HandleMouseMotion(int relativeX, int relativeY)
+{
+  CLockObject lock(m_mouseMutex);
+  m_mouseRelativePosition.x += relativeX;
+  m_mouseRelativePosition.y += relativeY;
 }
