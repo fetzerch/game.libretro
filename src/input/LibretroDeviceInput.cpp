@@ -29,7 +29,8 @@ using namespace P8PLATFORM;
 #define LIBRETRO_JOYPAD_BUTTON_COUNT     16
 #define LIBRETRO_ANALOG_STICK_COUNT      2
 #define LIBRETRO_ACCELEROMETER_COUNT     1
-#define LIBRETRO_MOUSE_BUTTON_COUNT      2
+#define LIBRETRO_MOUSE_BUTTON_COUNT      5
+#define LIBRETRO_MOUSE_BUTTON_START      RETRO_DEVICE_ID_MOUSE_LEFT
 #define LIBRETRO_LIGHTGUN_BUTTON_COUNT   5
 #define LIBRETRO_RELATIVE_POINTER_COUNT  1
 #define LIBRETRO_ABSOLUTE_POINTER_COUNT  10
@@ -167,7 +168,9 @@ bool CLibretroDeviceInput::InputEvent(const game_input_event& event)
     switch (event.type)
     {
       case GAME_INPUT_EVENT_DIGITAL_BUTTON:
-        if (index < (int)m_buttons.size())
+        if (CButtonMapper::Get().GetLibretroType(event.controller_id) == RETRO_DEVICE_MOUSE)
+          index -= LIBRETRO_MOUSE_BUTTON_START;
+        if (0 <= index && index < (int)m_buttons.size())
           m_buttons[index] = event.digital_button;
         break;
 

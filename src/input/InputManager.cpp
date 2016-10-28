@@ -73,10 +73,6 @@ bool CInputManager::OpenPort(unsigned int port)
   if (!CLibretroEnvironment::Get().GetFrontend())
     return false;
 
-  // Sanity check
-  if (port > 32)
-    return false;
-
   CLibretroEnvironment::Get().GetFrontend()->OpenPort(port);
 
   return true;
@@ -129,7 +125,7 @@ bool CInputManager::InputEvent(const game_input_event& event)
       const retro_mod key_modifiers = LibretroTranslator::GetKeyModifiers(event.key.modifiers);
 
       dsyslog("Key %s: %s (0x%04x)", down ? "down" : "up",
-          LibretroTranslator::GetKeyName(character), character);
+          LibretroTranslator::GetKeyName(event.key.character), character);
 
       clientBridge->KeyboardEvent(down, keycode, character, key_modifiers);
     }
@@ -192,6 +188,13 @@ bool CInputManager::ButtonState(libretro_device_t device, unsigned int port, uns
   {
     bState = IsPressed(buttonIndex);
   }
+  else if (device == RETRO_DEVICE_MOUSE)
+  {
+    if (m_devices[GAME_INPUT_PORT_MOUSE])
+    {
+      bState = m_devices[GAME_INPUT_PORT_MOUSE]->Input().ButtonState(buttonIndex);
+    }
+  }
   else
   {
     if (m_devices[port])
@@ -207,9 +210,10 @@ int CInputManager::DeltaX(libretro_device_t device, unsigned int port)
 {
   int deltaX = 0;
 
-  if (m_devices[port])
+  if (device == RETRO_DEVICE_MOUSE || device == RETRO_DEVICE_LIGHTGUN)
   {
-    deltaX = m_devices[port]->Input().RelativePointerDeltaX();
+    if (m_devices[GAME_INPUT_PORT_MOUSE])
+      deltaX = m_devices[GAME_INPUT_PORT_MOUSE]->Input().RelativePointerDeltaX();
   }
 
   return deltaX;
@@ -219,9 +223,10 @@ int CInputManager::DeltaY(libretro_device_t device, unsigned int port)
 {
   int deltaY = 0;
 
-  if (m_devices[port])
+  if (device == RETRO_DEVICE_MOUSE || device == RETRO_DEVICE_LIGHTGUN)
   {
-    deltaY = m_devices[port]->Input().RelativePointerDeltaY();
+    if (m_devices[GAME_INPUT_PORT_MOUSE])
+      deltaY = m_devices[GAME_INPUT_PORT_MOUSE]->Input().RelativePointerDeltaY();
   }
 
   return deltaY;
@@ -290,4 +295,11 @@ bool CInputManager::IsPressed(uint32_t character)
     {
       return keyEvent.character == character;
     }) > 0;
+}
+
+void CInputManager::HandleMouseMotion(int relativeX, int relativeY)
+{
+  CLockObject lock(m_mouseMutex);
+  m_mouseRelativePosition.x += relativeX;
+  m_mouseRelativePosition.y += relativeY;
 }
