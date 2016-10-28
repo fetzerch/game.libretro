@@ -99,8 +99,14 @@ namespace LIBRETRO
     void HandlePress(const game_key_event& key);
     bool IsPressed(uint32_t character);
 
+    void HandleMouseMotion(int relativeX, int relativeY);
+
     std::map<unsigned int, DevicePtr> m_devices;
     std::vector<game_key_event>       m_pressedKeys;
     P8PLATFORM::CMutex                m_keyMutex;
+    game_rel_pointer_event            m_mouseRelativePosition;
+    game_digital_button_event         m_mouseLeftButton;
+    game_digital_button_event         m_mouseRightButton;
+    P8PLATFORM::CMutex                m_mouseMutex;
   };
 }
