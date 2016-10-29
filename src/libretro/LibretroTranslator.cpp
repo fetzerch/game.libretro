@@ -122,8 +122,14 @@ int LibretroTranslator::GetFeatureIndex(const std::string& strFeatureName)
   if (strFeatureName == "r3")           return RETRO_DEVICE_ID_JOYPAD_R3;
   if (strFeatureName == "leftstick")    return RETRO_DEVICE_INDEX_ANALOG_LEFT;
   if (strFeatureName == "rightstick")   return RETRO_DEVICE_INDEX_ANALOG_RIGHT;
+  if (strFeatureName == "relpointer")   return 0; // Only 1 relative pointer
   if (strFeatureName == "leftmouse")    return RETRO_DEVICE_ID_MOUSE_LEFT;
   if (strFeatureName == "rightmouse")   return RETRO_DEVICE_ID_MOUSE_RIGHT;
+  if (strFeatureName == "wheelup")      return RETRO_DEVICE_ID_MOUSE_WHEELUP;
+  if (strFeatureName == "wheeldown")    return RETRO_DEVICE_ID_MOUSE_WHEELDOWN;
+  if (strFeatureName == "middle")       return RETRO_DEVICE_ID_MOUSE_MIDDLE;
+  if (strFeatureName == "horizwheelup") return RETRO_DEVICE_ID_MOUSE_HORIZ_WHEELUP;
+  if (strFeatureName == "horizwheeldown") return RETRO_DEVICE_ID_MOUSE_HORIZ_WHEELDOWN;
   if (strFeatureName == "trigger")      return RETRO_DEVICE_ID_LIGHTGUN_TRIGGER;
   if (strFeatureName == "cursor")       return RETRO_DEVICE_ID_LIGHTGUN_CURSOR;
   if (strFeatureName == "turbo")        return RETRO_DEVICE_ID_LIGHTGUN_TURBO;
