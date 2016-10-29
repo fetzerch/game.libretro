@@ -233,22 +233,28 @@ bool CInputManager::ButtonState(libretro_device_t device, unsigned int port, uns
 
 int CInputManager::DeltaX(libretro_device_t device, unsigned int port)
 {
-  (void) device;
-  (void) port;
-  CLockObject lock(m_mouseMutex);
-  int x = m_mouseRelativePosition.x;
-  m_mouseRelativePosition.x = 0;
-  return x;
+  int deltaX = 0;
+
+  if (device == RETRO_DEVICE_MOUSE || device == RETRO_DEVICE_LIGHTGUN)
+  {
+    if (m_devices[GAME_INPUT_PORT_MOUSE])
+      deltaX = m_devices[GAME_INPUT_PORT_MOUSE]->Input().RelativePointerDeltaX();
+  }
+
+  return deltaX;
 }
 
 int CInputManager::DeltaY(libretro_device_t device, unsigned int port)
 {
-  (void) device;
-  (void) port;
-  CLockObject lock(m_mouseMutex);
-  int y = m_mouseRelativePosition.y;
-  m_mouseRelativePosition.y = 0;
-  return y;
+  int deltaY = 0;
+
+  if (device == RETRO_DEVICE_MOUSE || device == RETRO_DEVICE_LIGHTGUN)
+  {
+    if (m_devices[GAME_INPUT_PORT_MOUSE])
+      deltaY = m_devices[GAME_INPUT_PORT_MOUSE]->Input().RelativePointerDeltaX();
+  }
+
+  return deltaY;
 }
 
 bool CInputManager::AnalogStickState(unsigned int port, unsigned int analogStickIndex, float& x, float& y)
