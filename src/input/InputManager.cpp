@@ -188,6 +188,10 @@ bool CInputManager::ButtonState(libretro_device_t device, unsigned int port, uns
   {
     bState = IsPressed(buttonIndex);
   }
+  else if (device == RETRO_DEVICE_MOUSE)
+  {
+    bState = m_devices[GAME_INPUT_PORT_MOUSE]->Input().ButtonState(buttonIndex);
+  }
   else
   {
     if (m_devices[port])
