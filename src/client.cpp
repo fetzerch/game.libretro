@@ -278,6 +278,8 @@ GAME_ERROR LoadGame(const char* url)
     CInputManager::Get().OpenPort(1);
     CInputManager::Get().OpenPort(2);
     CInputManager::Get().OpenPort(3);
+
+    CInputManager::Get().OpenPort(GAME_INPUT_PORT_MOUSE);
   }
 
   return bResult ? GAME_ERROR_NO_ERROR : GAME_ERROR_FAILED;
@@ -338,6 +340,8 @@ GAME_ERROR LoadStandalone(void)
   CInputManager::Get().OpenPort(1);
   CInputManager::Get().OpenPort(2);
   CInputManager::Get().OpenPort(3);
+
+  CInputManager::Get().OpenPort(GAME_INPUT_PORT_MOUSE);
 
   return GAME_ERROR_NO_ERROR;
 }

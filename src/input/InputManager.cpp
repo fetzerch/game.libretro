@@ -73,10 +73,6 @@ bool CInputManager::OpenPort(unsigned int port)
   if (!CLibretroEnvironment::Get().GetFrontend())
     return false;
 
-  // Sanity check
-  if (port > 32)
-    return false;
-
   CLibretroEnvironment::Get().GetFrontend()->OpenPort(port);
 
   return true;
@@ -139,25 +135,6 @@ bool CInputManager::InputEvent(const game_input_event& event)
 
     bHandled = true;
   }
-  else if (event.type == GAME_INPUT_EVENT_RELATIVE_POINTER)
-  {
-    // Record mouse motion for polling
-    HandleMouseMotion(event.rel_pointer.x, event.rel_pointer.y);
-    bHandled = true;
-  }
-  else if (event.type == GAME_INPUT_EVENT_DIGITAL_BUTTON && event.port == -1)
-  {
-    if (std::string(event.feature_name) == "leftmouse")
-    {
-      m_mouseLeftButton.pressed = event.digital_button.pressed;
-      bHandled = true;
-    }
-    else if (std::string(event.feature_name) == "rightmouse")
-    {
-      m_mouseRightButton.pressed = event.digital_button.pressed;
-      bHandled = true;
-    }
-  }
   else
   {
     const unsigned int port = event.port;
@@ -211,15 +188,6 @@ bool CInputManager::ButtonState(libretro_device_t device, unsigned int port, uns
   {
     bState = IsPressed(buttonIndex);
   }
-  else if (device == RETRO_DEVICE_MOUSE)
-  {
-    switch (buttonIndex)
-    {
-      case 0: bState = m_mouseLeftButton.pressed; break;
-      case 1: bState = m_mouseRightButton.pressed; break;
-      default: break;
-    }
-  }
   else
   {
     if (m_devices[port])
@@ -251,7 +219,7 @@ int CInputManager::DeltaY(libretro_device_t device, unsigned int port)
   if (device == RETRO_DEVICE_MOUSE || device == RETRO_DEVICE_LIGHTGUN)
   {
     if (m_devices[GAME_INPUT_PORT_MOUSE])
-      deltaY = m_devices[GAME_INPUT_PORT_MOUSE]->Input().RelativePointerDeltaX();
+      deltaY = m_devices[GAME_INPUT_PORT_MOUSE]->Input().RelativePointerDeltaY();
   }
 
   return deltaY;
