@@ -168,7 +168,7 @@ bool CLibretroDeviceInput::InputEvent(const game_input_event& event)
     switch (event.type)
     {
       case GAME_INPUT_EVENT_DIGITAL_BUTTON:
-        if (CButtonMapper::Get().GetLibretroType(event.controller_id) == RETRO_DEVICE_MOUSE)
+        if (0 <= index && index < (int)m_buttons.size())
           index -= LIBRETRO_MOUSE_BUTTON_START;
         if (index < (int)m_buttons.size())
           m_buttons[index] = event.digital_button;
