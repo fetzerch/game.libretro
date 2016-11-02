@@ -153,7 +153,7 @@ void CInputManager::LogInputDescriptors(const retro_input_descriptor* descriptor
   dsyslog("");
 
   for (const retro_input_descriptor* descriptor = descriptors;
-      descriptor != nullptr && descriptor->description != nullptr;
+      descriptor != nullptr && descriptor->description != nullptr && !std::string(descriptor->description).empty();
       descriptor++)
   {
     std::string component = LibretroTranslator::GetComponentName(descriptor->device, descriptor->index, descriptor->id);
