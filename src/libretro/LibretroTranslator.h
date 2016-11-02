@@ -69,7 +69,7 @@ namespace LIBRETRO
     static libretro_device_t GetDeviceType(const std::string& strType);
 
     /*!
-     * \brief Translate feature name (Game API) to libretro button/feature id value.
+     * \brief Translate button/feature name (libretro buttonmap "mapto" field) to libretro index value.
      * \param strFeatureName The feature name to translate.
      * \return Translated button/feature id.
      */
