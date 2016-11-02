@@ -31,21 +31,7 @@ namespace LIBRETRO
   }
 }
 
-GAME_HW_CONTEXT_TYPE LibretroTranslator::GetHWContextType(retro_hw_context_type type)
-{
-  switch (type)
-  {
-    case RETRO_HW_CONTEXT_OPENGL:      return GAME_HW_CONTEXT_OPENGL;
-    case RETRO_HW_CONTEXT_OPENGLES2:   return GAME_HW_CONTEXT_OPENGLES2;
-    case RETRO_HW_CONTEXT_OPENGL_CORE: return GAME_HW_CONTEXT_OPENGL_CORE;
-    case RETRO_HW_CONTEXT_OPENGLES3:   return GAME_HW_CONTEXT_OPENGLES3;
-    case RETRO_HW_CONTEXT_NONE:
-    case RETRO_HW_CONTEXT_DUMMY:
-    default:
-      break;
-  }
-  return GAME_HW_CONTEXT_NONE;
-}
+// --- Audo/video translation ----------------------------------------------
 
 GAME_PIXEL_FORMAT LibretroTranslator::GetVideoFormat(retro_pixel_format format)
 {
@@ -75,21 +61,25 @@ GAME_VIDEO_ROTATION LibretroTranslator::GetVideoRotation(unsigned int rotation)
   return GAME_VIDEO_ROTATION_0;
 }
 
-retro_mod LibretroTranslator::GetKeyModifiers(GAME_KEY_MOD modifiers)
+// --- Hardware rendering translation --------------------------------------
+
+GAME_HW_CONTEXT_TYPE LibretroTranslator::GetHWContextType(retro_hw_context_type type)
 {
-  retro_mod mods = RETROKMOD_NONE;
-
-  if (modifiers & GAME_KEY_MOD_SHIFT)      mods = mods | RETROKMOD_SHIFT;
-  if (modifiers & GAME_KEY_MOD_CTRL)       mods = mods | RETROKMOD_CTRL;
-  if (modifiers & GAME_KEY_MOD_ALT)        mods = mods | RETROKMOD_ALT;
-  if (modifiers & GAME_KEY_MOD_RALT)       mods = mods | RETROKMOD_ALT;
-  if (modifiers & GAME_KEY_MOD_META)       mods = mods | RETROKMOD_META;
-  if (modifiers & GAME_KEY_MOD_NUMLOCK)    mods = mods | RETROKMOD_NUMLOCK;
-  if (modifiers & GAME_KEY_MOD_CAPSLOCK)   mods = mods | RETROKMOD_CAPSLOCK;
-  if (modifiers & GAME_KEY_MOD_SCROLLOCK)  mods = mods | RETROKMOD_SCROLLOCK;
-
-  return mods;
+  switch (type)
+  {
+    case RETRO_HW_CONTEXT_OPENGL:      return GAME_HW_CONTEXT_OPENGL;
+    case RETRO_HW_CONTEXT_OPENGLES2:   return GAME_HW_CONTEXT_OPENGLES2;
+    case RETRO_HW_CONTEXT_OPENGL_CORE: return GAME_HW_CONTEXT_OPENGL_CORE;
+    case RETRO_HW_CONTEXT_OPENGLES3:   return GAME_HW_CONTEXT_OPENGLES3;
+    case RETRO_HW_CONTEXT_NONE:
+    case RETRO_HW_CONTEXT_DUMMY:
+    default:
+      break;
+  }
+  return GAME_HW_CONTEXT_NONE;
 }
+
+// --- Input translation --------------------------------------------------
 
 libretro_device_t LibretroTranslator::GetDeviceType(const std::string& strType)
 {
@@ -101,6 +91,23 @@ libretro_device_t LibretroTranslator::GetDeviceType(const std::string& strType)
   if (strType == "pointer")  return RETRO_DEVICE_POINTER;
 
   return RETRO_DEVICE_NONE;
+}
+
+const char* LibretroTranslator::GetDeviceName(libretro_device_t type)
+{
+  switch (type)
+  {
+  case RETRO_DEVICE_JOYPAD:   return "joypad";
+  case RETRO_DEVICE_MOUSE:    return "mouse";
+  case RETRO_DEVICE_KEYBOARD: return "keyboard";
+  case RETRO_DEVICE_LIGHTGUN: return "lightgun";
+  case RETRO_DEVICE_ANALOG:   return "analog";
+  case RETRO_DEVICE_POINTER:  return "pointer";
+  default:
+    break;
+  }
+
+  return "";
 }
 
 int LibretroTranslator::GetFeatureIndex(const std::string& strFeatureName)
@@ -131,15 +138,174 @@ int LibretroTranslator::GetFeatureIndex(const std::string& strFeatureName)
   if (strFeatureName == "middle")       return RETRO_DEVICE_ID_MOUSE_MIDDLE;
   if (strFeatureName == "horizwheelup") return RETRO_DEVICE_ID_MOUSE_HORIZ_WHEELUP;
   if (strFeatureName == "horizwheeldown") return RETRO_DEVICE_ID_MOUSE_HORIZ_WHEELDOWN;
+  if (strFeatureName == "gunpointer")   return 0; // Only 1 relative pointer
   if (strFeatureName == "trigger")      return RETRO_DEVICE_ID_LIGHTGUN_TRIGGER;
   if (strFeatureName == "cursor")       return RETRO_DEVICE_ID_LIGHTGUN_CURSOR;
   if (strFeatureName == "turbo")        return RETRO_DEVICE_ID_LIGHTGUN_TURBO;
   if (strFeatureName == "pause")        return RETRO_DEVICE_ID_LIGHTGUN_PAUSE;
-  if (strFeatureName == "start")        return RETRO_DEVICE_ID_LIGHTGUN_START;
+  if (strFeatureName == "gunstart")     return RETRO_DEVICE_ID_LIGHTGUN_START;
   if (strFeatureName == "strong")       return RETRO_RUMBLE_STRONG;
   if (strFeatureName == "weak")         return RETRO_RUMBLE_WEAK;
 
   return -1;
+}
+
+const char* LibretroTranslator::GetFeatureName(libretro_device_t type, unsigned int index, unsigned int id)
+{
+  switch (type)
+  {
+  case RETRO_DEVICE_JOYPAD:
+  {
+    switch (id)
+    {
+    case RETRO_DEVICE_ID_JOYPAD_B:        return "b";
+    case RETRO_DEVICE_ID_JOYPAD_Y:        return "y";
+    case RETRO_DEVICE_ID_JOYPAD_SELECT:   return "select";
+    case RETRO_DEVICE_ID_JOYPAD_START:    return "start";
+    case RETRO_DEVICE_ID_JOYPAD_UP:       return "up";
+    case RETRO_DEVICE_ID_JOYPAD_DOWN:     return "down";
+    case RETRO_DEVICE_ID_JOYPAD_LEFT:     return "left";
+    case RETRO_DEVICE_ID_JOYPAD_RIGHT:    return "right";
+    case RETRO_DEVICE_ID_JOYPAD_A:        return "a";
+    case RETRO_DEVICE_ID_JOYPAD_X:        return "x";
+    case RETRO_DEVICE_ID_JOYPAD_L:        return "l";
+    case RETRO_DEVICE_ID_JOYPAD_R:        return "r";
+    case RETRO_DEVICE_ID_JOYPAD_L2:       return "l2";
+    case RETRO_DEVICE_ID_JOYPAD_R2:       return "r2";
+    case RETRO_DEVICE_ID_JOYPAD_L3:       return "l3";
+    case RETRO_DEVICE_ID_JOYPAD_R3:       return "r3";
+    default:
+      break;
+    }
+    break;
+  }
+  case RETRO_DEVICE_MOUSE:
+  {
+    switch (id)
+    {
+    case RETRO_DEVICE_ID_MOUSE_X:
+    case RETRO_DEVICE_ID_MOUSE_Y:
+      return "relpointer";
+
+    case RETRO_DEVICE_ID_MOUSE_LEFT:             return "leftmouse";
+    case RETRO_DEVICE_ID_MOUSE_RIGHT:            return "rightmouse";
+    case RETRO_DEVICE_ID_MOUSE_WHEELUP:          return "wheelup";
+    case RETRO_DEVICE_ID_MOUSE_WHEELDOWN:        return "wheeldown";
+    case RETRO_DEVICE_ID_MOUSE_MIDDLE:           return "middle";
+    case RETRO_DEVICE_ID_MOUSE_HORIZ_WHEELUP:    return "horizwheelup";
+    case RETRO_DEVICE_ID_MOUSE_HORIZ_WHEELDOWN:  return "horizwheeldown";
+    default:
+      break;
+    }
+    break;
+  }
+  case RETRO_DEVICE_KEYBOARD:
+  {
+    break; // TODO
+  }
+  case RETRO_DEVICE_LIGHTGUN:
+  {
+    switch (id)
+    {
+    case RETRO_DEVICE_ID_LIGHTGUN_X:
+    case RETRO_DEVICE_ID_LIGHTGUN_Y:
+      return "gunpointer";
+
+    case RETRO_DEVICE_ID_LIGHTGUN_TRIGGER:  return "trigger";
+    case RETRO_DEVICE_ID_LIGHTGUN_CURSOR:   return "cursor";
+    case RETRO_DEVICE_ID_LIGHTGUN_TURBO:    return "turbo";
+    case RETRO_DEVICE_ID_LIGHTGUN_PAUSE:    return "pause";
+    case RETRO_DEVICE_ID_LIGHTGUN_START:    return "gunstart";
+    default:
+      break;
+    }
+    break;
+  }
+  case RETRO_DEVICE_ANALOG:
+  {
+    switch (id)
+    {
+    case RETRO_DEVICE_ID_ANALOG_X:
+    case RETRO_DEVICE_ID_ANALOG_Y:
+    {
+      switch (index)
+      {
+      case RETRO_DEVICE_INDEX_ANALOG_LEFT:  return "leftstick";
+      case RETRO_DEVICE_INDEX_ANALOG_RIGHT: return "rightstick";
+      default:
+        break;
+      }
+      break;
+    }
+    break;
+    default:
+      break;
+    }
+  }
+  case RETRO_DEVICE_POINTER:
+  {
+    break; // TODO
+  }
+  default:
+    break;
+  }
+
+  return "";
+}
+
+const char* LibretroTranslator::GetComponentName(libretro_device_t type, unsigned int index, unsigned int id)
+{
+  switch (type)
+  {
+  case RETRO_DEVICE_ANALOG:
+  {
+    switch (id)
+    {
+    case RETRO_DEVICE_ID_ANALOG_X:  return "x";
+    case RETRO_DEVICE_ID_ANALOG_Y:  return "y";
+    default:
+      break;
+    }
+    break;
+  }
+  case RETRO_DEVICE_MOUSE:
+  {
+    switch (id)
+    {
+    case RETRO_DEVICE_ID_MOUSE_X:  return "x";
+    case RETRO_DEVICE_ID_MOUSE_Y:  return "y";
+    default:
+      break;
+    }
+    break;
+  }
+  case RETRO_DEVICE_LIGHTGUN:
+  {
+    switch (id)
+    {
+    case RETRO_DEVICE_ID_LIGHTGUN_X:  return "x";
+    case RETRO_DEVICE_ID_LIGHTGUN_Y:  return "y";
+    default:
+      break;
+    }
+    break;
+  }
+  case RETRO_DEVICE_POINTER:
+  {
+    switch (id)
+    {
+    case RETRO_DEVICE_ID_POINTER_X:  return "x";
+    case RETRO_DEVICE_ID_POINTER_Y:  return "y";
+    default:
+      break;
+    }
+    break;
+  }
+  default:
+    break;
+  }
+
+  return "";
 }
 
 std::string LibretroTranslator::GetMotorName(retro_rumble_effect effect)
@@ -152,6 +318,22 @@ std::string LibretroTranslator::GetMotorName(retro_rumble_effect effect)
       break;
   }
   return "";
+}
+
+retro_mod LibretroTranslator::GetKeyModifiers(GAME_KEY_MOD modifiers)
+{
+  retro_mod mods = RETROKMOD_NONE;
+
+  if (modifiers & GAME_KEY_MOD_SHIFT)      mods = mods | RETROKMOD_SHIFT;
+  if (modifiers & GAME_KEY_MOD_CTRL)       mods = mods | RETROKMOD_CTRL;
+  if (modifiers & GAME_KEY_MOD_ALT)        mods = mods | RETROKMOD_ALT;
+  if (modifiers & GAME_KEY_MOD_RALT)       mods = mods | RETROKMOD_ALT;
+  if (modifiers & GAME_KEY_MOD_META)       mods = mods | RETROKMOD_META;
+  if (modifiers & GAME_KEY_MOD_NUMLOCK)    mods = mods | RETROKMOD_NUMLOCK;
+  if (modifiers & GAME_KEY_MOD_CAPSLOCK)   mods = mods | RETROKMOD_CAPSLOCK;
+  if (modifiers & GAME_KEY_MOD_SCROLLOCK)  mods = mods | RETROKMOD_SCROLLOCK;
+
+  return mods;
 }
 
 retro_key LibretroTranslator::GetKeyCode(XBMCVKey character)
