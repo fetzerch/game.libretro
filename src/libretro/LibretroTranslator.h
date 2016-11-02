@@ -52,55 +52,55 @@ namespace LIBRETRO
      * \param format The video format to translate.
      * \return Translated video format.
      */
-    static GAME_PIXEL_FORMAT    GetVideoFormat(retro_pixel_format format);
+    static GAME_PIXEL_FORMAT GetVideoFormat(retro_pixel_format format);
 
     /*!
      * \brief Translate video rotation (libretro to Game API).
      * \param rotation The video rotation to translate as set by RETRO_ENVIRONMENT_SET_ROTATION.
      * \return Translated video rotation.
      */
-    static GAME_VIDEO_ROTATION  GetVideoRotation(unsigned int rotation);
+    static GAME_VIDEO_ROTATION GetVideoRotation(unsigned int rotation);
 
     /*!
      * \brief Translate device type (Game API to libretro).
      * \param strType The device type to translate.
      * \return Translated device values.
      */
-    static libretro_device_t    GetDeviceType(const std::string& strType);
+    static libretro_device_t GetDeviceType(const std::string& strType);
 
     /*!
      * \brief Translate feature name (Game API) to libretro button/feature id value.
      * \param strFeatureName The feature name to translate.
      * \return Translated button/feature id.
      */
-    static int                  GetFeatureIndex(const std::string& strFeatureName);
+    static int GetFeatureIndex(const std::string& strFeatureName);
 
     /*!
      * \brief Translate rumble motor name (libretro) to string representation (e.g. for logging).
      * \param effect The rumble motor name to translate.
      * \return String representation of rumble motor name.
      */
-    static std::string          GetMotorName(retro_rumble_effect effect);
+    static std::string GetMotorName(retro_rumble_effect effect);
 
     /*!
      * \brief Translate key modifiers (Game API to libretro).
      * \param modifiers The key modifiers to translate (e.g. Shift, Ctrl).
      * \return Translated key modifiers.
      */
-    static retro_mod            GetKeyModifiers(GAME_KEY_MOD modifiers);
+    static retro_mod GetKeyModifiers(GAME_KEY_MOD modifiers);
 
     /*!
      * \brief Translate keycode (Game API to libretro).
      * \param character The character to translate.
      * \return Translated character.
      */
-    static retro_key            GetKeyCode(XBMCVKey character);
+    static retro_key GetKeyCode(XBMCVKey character);
 
     /*!
      * \brief Translate keycode (Game API) to string representation (e.g. for logging pressed buttons).
      * \param character The character to translate.
      * \return String representation of character.
      */
-    static const char*          GetKeyName(XBMCVKey keycode);
+    static const char* GetKeyName(XBMCVKey keycode);
   };
 }
