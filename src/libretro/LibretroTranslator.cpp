@@ -154,7 +154,7 @@ std::string LibretroTranslator::GetMotorName(retro_rumble_effect effect)
   return "";
 }
 
-retro_key LibretroTranslator::GetKeyCode(uint32_t character)
+retro_key LibretroTranslator::GetKeyCode(XBMCVKey character)
 {
   switch (character)
   {
@@ -305,7 +305,7 @@ retro_key LibretroTranslator::GetKeyCode(uint32_t character)
   return RETROK_UNKNOWN;
 }
 
-const char* LibretroTranslator::GetKeyName(uint32_t code)
+const char* LibretroTranslator::GetKeyName(XBMCVKey code)
 {
   switch (code)
   {

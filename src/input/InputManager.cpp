@@ -125,7 +125,7 @@ bool CInputManager::InputEvent(const game_input_event& event)
       const retro_mod key_modifiers = LibretroTranslator::GetKeyModifiers(event.key.modifiers);
 
       dsyslog("Key %s: %s (0x%04x)", down ? "down" : "up",
-          LibretroTranslator::GetKeyName(character), character);
+          LibretroTranslator::GetKeyName(event.key.character), character);
 
       clientBridge->KeyboardEvent(down, keycode, character, key_modifiers);
     }
