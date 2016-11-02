@@ -40,12 +40,7 @@ namespace LIBRETRO
     LibretroTranslator() = delete;
 
   public:
-    /*!
-     * \brief Translate HW context type (libretro to Game API)
-     * \param type The HW context type to translate (e.g. OpenGL, OpenGLES).
-     * \return Translated HW context type.
-     */
-    static GAME_HW_CONTEXT_TYPE GetHWContextType(retro_hw_context_type type);
+    // --- Audo/video translation ----------------------------------------------
 
     /*!
      * \brief Translate video format (libretro to Game API).
@@ -60,6 +55,17 @@ namespace LIBRETRO
      * \return Translated video rotation.
      */
     static GAME_VIDEO_ROTATION GetVideoRotation(unsigned int rotation);
+
+    // --- Hardware rendering translation --------------------------------------
+
+    /*!
+     * \brief Translate HW context type (libretro to Game API)
+     * \param type The HW context type to translate (e.g. OpenGL, OpenGLES).
+     * \return Translated HW context type.
+     */
+    static GAME_HW_CONTEXT_TYPE GetHWContextType(retro_hw_context_type type);
+
+    // --- Input translation --------------------------------------------------
 
     /*!
      * \brief Translate device type (Game API to libretro).
