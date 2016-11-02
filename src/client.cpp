@@ -473,7 +473,7 @@ void UpdatePort(unsigned int port, bool connected, const game_controller* contro
 
   const unsigned int device = CInputManager::Get().GetDevice(port);
 
-  if (CLIENT)
+  if (CLIENT && (int)port >= 0)
     CLIENT->retro_set_controller_port_device(port, device);
 }
 
