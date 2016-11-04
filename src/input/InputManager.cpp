@@ -40,6 +40,13 @@ CInputManager& CInputManager::Get(void)
   return _instance;
 }
 
+CInputManager::CInputManager()
+{
+  game_controller mouseControllerStruct = {};
+  mouseControllerStruct.controller_id = "game.controller.mouse";
+  m_mouseDevice = std::make_shared<CLibretroDevice>(&mouseControllerStruct);
+}
+
 libretro_device_caps_t CInputManager::GetDeviceCaps(void) const
 {
   return 1 << RETRO_DEVICE_JOYPAD   |
@@ -135,6 +142,10 @@ bool CInputManager::InputEvent(const game_input_event& event)
 
     bHandled = true;
   }
+  else if (event.port == GAME_INPUT_PORT_MOUSE)
+  {
+    bHandled = m_mouseDevice->Input().InputEvent(event);
+  }
   else
   {
     const unsigned int port = event.port;
@@ -199,10 +210,7 @@ bool CInputManager::ButtonState(libretro_device_t device, unsigned int port, uns
   }
   else if (device == RETRO_DEVICE_MOUSE)
   {
-    if (m_devices[GAME_INPUT_PORT_MOUSE])
-    {
-      bState = m_devices[GAME_INPUT_PORT_MOUSE]->Input().ButtonState(buttonIndex);
-    }
+    bState = m_mouseDevice->Input().ButtonState(buttonIndex);
   }
   else
   {
@@ -219,10 +227,16 @@ int CInputManager::DeltaX(libretro_device_t device, unsigned int port)
 {
   int deltaX = 0;
 
-  if (device == RETRO_DEVICE_MOUSE || device == RETRO_DEVICE_LIGHTGUN)
+  if (device == RETRO_DEVICE_MOUSE)
   {
-    if (m_devices[GAME_INPUT_PORT_MOUSE])
-      deltaX = m_devices[GAME_INPUT_PORT_MOUSE]->Input().RelativePointerDeltaX();
+    deltaX = m_mouseDevice->Input().RelativePointerDeltaX();
+  }
+  else if (device == RETRO_DEVICE_LIGHTGUN)
+  {
+    if (m_devices[port])
+    {
+      deltaX = m_devices[port]->Input().RelativePointerDeltaX();
+    }
   }
 
   return deltaX;
@@ -234,8 +248,14 @@ int CInputManager::DeltaY(libretro_device_t device, unsigned int port)
 
   if (device == RETRO_DEVICE_MOUSE || device == RETRO_DEVICE_LIGHTGUN)
   {
-    if (m_devices[GAME_INPUT_PORT_MOUSE])
-      deltaY = m_devices[GAME_INPUT_PORT_MOUSE]->Input().RelativePointerDeltaY();
+    deltaY = m_mouseDevice->Input().RelativePointerDeltaY();
+  }
+  else if (device == RETRO_DEVICE_LIGHTGUN)
+  {
+    if (m_devices[port])
+    {
+      deltaY = m_devices[port]->Input().RelativePointerDeltaX();
+    }
   }
 
   return deltaY;
@@ -324,11 +344,4 @@ bool CInputManager::IsPressed(uint32_t character)
     {
       return keyEvent.character == character;
     }) > 0;
-}
-
-void CInputManager::HandleMouseMotion(int relativeX, int relativeY)
-{
-  CLockObject lock(m_mouseMutex);
-  m_mouseRelativePosition.x += relativeX;
-  m_mouseRelativePosition.y += relativeY;
 }
