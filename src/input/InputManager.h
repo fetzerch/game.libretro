@@ -38,7 +38,7 @@ namespace LIBRETRO
   class CInputManager
   {
   private:
-    CInputManager(void);
+    CInputManager(void) { }
 
   public:
     static CInputManager& Get(void);
@@ -105,10 +105,7 @@ namespace LIBRETRO
     void HandlePress(const game_key_event& key);
     bool IsPressed(uint32_t character);
 
-    void HandleMouseMotion(int relativeX, int relativeY);
-
     std::map<unsigned int, DevicePtr> m_devices;
-    DevicePtr                         m_mouseDevice;
     std::vector<game_key_event>       m_pressedKeys;
     P8PLATFORM::CMutex                m_keyMutex;
   };

@@ -40,13 +40,6 @@ CInputManager& CInputManager::Get(void)
   return _instance;
 }
 
-CInputManager::CInputManager()
-{
-  game_controller mouseControllerStruct = {};
-  mouseControllerStruct.controller_id = "game.controller.mouse";
-  m_mouseDevice = std::make_shared<CLibretroDevice>(&mouseControllerStruct);
-}
-
 libretro_device_caps_t CInputManager::GetDeviceCaps(void) const
 {
   return 1 << RETRO_DEVICE_JOYPAD   |
@@ -142,10 +135,6 @@ bool CInputManager::InputEvent(const game_input_event& event)
 
     bHandled = true;
   }
-  else if (event.port == GAME_INPUT_PORT_MOUSE)
-  {
-    bHandled = m_mouseDevice->Input().InputEvent(event);
-  }
   else
   {
     const unsigned int port = event.port;
@@ -208,10 +197,6 @@ bool CInputManager::ButtonState(libretro_device_t device, unsigned int port, uns
   {
     bState = IsPressed(buttonIndex);
   }
-  else if (device == RETRO_DEVICE_MOUSE)
-  {
-    bState = m_mouseDevice->Input().ButtonState(buttonIndex);
-  }
   else
   {
     if (m_devices[port])
@@ -227,16 +212,14 @@ int CInputManager::DeltaX(libretro_device_t device, unsigned int port)
 {
   int deltaX = 0;
 
+  int iPort = port;
+
   if (device == RETRO_DEVICE_MOUSE)
+    iPort = GAME_INPUT_PORT_MOUSE;
+
+  if (m_devices[iPort])
   {
-    deltaX = m_mouseDevice->Input().RelativePointerDeltaX();
-  }
-  else if (device == RETRO_DEVICE_LIGHTGUN)
-  {
-    if (m_devices[port])
-    {
-      deltaX = m_devices[port]->Input().RelativePointerDeltaX();
-    }
+    deltaX = m_devices[iPort]->Input().RelativePointerDeltaX();
   }
 
   return deltaX;
@@ -246,16 +229,14 @@ int CInputManager::DeltaY(libretro_device_t device, unsigned int port)
 {
   int deltaY = 0;
 
-  if (device == RETRO_DEVICE_MOUSE || device == RETRO_DEVICE_LIGHTGUN)
+  int iPort = port;
+
+  if (device == RETRO_DEVICE_MOUSE)
+    iPort = GAME_INPUT_PORT_MOUSE;
+
+  if (m_devices[iPort])
   {
-    deltaY = m_mouseDevice->Input().RelativePointerDeltaY();
-  }
-  else if (device == RETRO_DEVICE_LIGHTGUN)
-  {
-    if (m_devices[port])
-    {
-      deltaY = m_devices[port]->Input().RelativePointerDeltaX();
-    }
+    deltaY= m_devices[iPort]->Input().RelativePointerDeltaY();
   }
 
   return deltaY;
