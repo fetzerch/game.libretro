@@ -50,7 +50,7 @@ libretro_device_caps_t CInputManager::GetDeviceCaps(void) const
          1 << RETRO_DEVICE_POINTER;
 }
 
-void CInputManager::DeviceConnected(unsigned int port, bool bConnected, const game_controller* connectedDevice)
+void CInputManager::DeviceConnected(int port, bool bConnected, const game_controller* connectedDevice)
 {
   if (bConnected)
     m_devices[port] = std::make_shared<CLibretroDevice>(connectedDevice);
